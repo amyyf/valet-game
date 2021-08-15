@@ -10,12 +10,23 @@
     "gulp-concat": "^2.6.1",
     "gulp-csso": "^4.0.1",
     "gulp-if": "^3.0.0",
-    "gulp-inject-string": "^1.1.2"
+    "gulp-inject-string": "^1.1.2",
+    "eslint": "^7.32.0",
+    "eslint-plugin-jest": "^24.4.0",
+    "husky": "^7.0.1",
+    "jest": "^27.0.6",
+    "lint-staged": "^11.1.2",
+    "prettier": "^2.3.2"
+  },
+  "lint-staged": {
+    "*.js": "eslint --cache --fix",
+    "*.{js,css,md}": "prettier --write"
   },
   "scripts": {
     "build": "export NODE_ENV=PRODUCTION && gulp",
     "dev": "export NODE_ENV=development && gulp dev",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "prepare": "husky install",
+    "test": "jest"
   },
   "repository": {
     "type": "git",
