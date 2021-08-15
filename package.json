@@ -1,0 +1,30 @@
+{
+  "name": "valet-game",
+  "version": "1.0.0",
+  "description": "An entry for 2021's js13kgames's contest, SPACE.",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {
+    "del": "^6.0.0",
+    "gulp": "^4.0.2",
+    "gulp-concat": "^2.6.1",
+    "gulp-csso": "^4.0.1",
+    "gulp-if": "^3.0.0",
+    "gulp-inject-string": "^1.1.2"
+  },
+  "scripts": {
+    "build": "export NODE_ENV=PRODUCTION && gulp",
+    "dev": "export NODE_ENV=development && gulp dev",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/amyyf/valet-game.git"
+  },
+  "author": "Amy Frieson, Steven Frieson",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/amyyf/valet-game/issues"
+  },
+  "homepage": "https://github.com/amyyf/valet-game#readme"
+}
