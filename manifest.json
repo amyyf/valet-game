@@ -1,0 +1,9 @@
+{
+  "name": "Valet Game",
+  "description": "TKTKTK",
+  "images": {
+    "large": "submission-assets/large.png",
+    "image_thumbnail": "submission-assets/thumbnail.png"
+  },
+  "categories": ["Desktop"]
+}
