@@ -26,7 +26,8 @@
     "build": "export NODE_ENV=PRODUCTION && gulp",
     "dev": "export NODE_ENV=development && gulp dev",
     "prepare": "husky install",
-    "test": "jest"
+    "test": "jest",
+    "lint": "eslint ."
   },
   "repository": {
     "type": "git",
