@@ -1,9 +1,10 @@
 {
-  "extends": "eslint:recommended",
+  "extends": ["eslint:recommended"],
   "root": true,
   "env": {
     "es6": true,
     "node": true,
     "browser": true
-  }
+  },
+  "ignorePatterns": ["dist"]
 }
