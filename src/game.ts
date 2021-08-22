@@ -3,67 +3,42 @@ import { createCanvas } from './utils.js';
 
 logger('we are scripting', 'in style');
 
-const drawLot = () => {
-  const [canvas, ctx] = createCanvas();
+const drawLot = (ctx: CanvasRenderingContext2D) => {
   ctx.fillStyle = 'gray';
   ctx.fillRect(0, 0, 300, 500);
+};
+
+const drawCar = (ctx: CanvasRenderingContext2D) => {
+  ctx.fillStyle = 'red';
+  ctx.rotate((carPosition.orientation * Math.PI) / 180);
+  ctx.fillRect(carPosition.x, carPosition.y, 75, 30);
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+};
+
+const render = (canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) => {
+  drawLot(ctx);
+  drawCar(ctx);
   canvas.style.height = '300px';
   canvas.style.width = '500px';
   document.body.append(canvas);
-  return ctx;
-};
-
-// TODO: this isn't working
-const getRotation = () => {
-  if (carDirection.up) {
-    if (carDirection.left) {
-      return (-45 * Math.PI) / 180;
-    } else if (carDirection.right) {
-      return (45 * Math.PI) / 180;
-    } else {
-      return 0;
-    }
-  } else if (carDirection.down) {
-    if (carDirection.left) {
-      return (225 * Math.PI) / 180;
-    } else if (carDirection.right) {
-      return (135 * Math.PI) / 180;
-    } else {
-      return 180;
-    }
-  } else if (carDirection.right) {
-    return 180;
-  } else {
-    return 270;
-  }
-};
-
-const drawCar = () => {
-  const [, ctx] = createCanvas();
-  const rotationAngle = getRotation();
-  ctx.rotate(rotationAngle);
-  ctx.fillStyle = 'red';
-  ctx.fillRect(0, 0, 30, 75);
-  ctx.setTransform(1, 0, 0, 1, 0, 0);
-  return ctx.getImageData(0, 0, 30, 75);
-};
-
-const renderCar = (lot: CanvasRenderingContext2D, car: ImageData) => {
-  lot.fillRect(0, 0, 300, 500);
-  lot.putImageData(car, carPosition.x, carPosition.y);
 };
 
 const carPosition = {
   x: 10,
   y: 20,
+  orientation: 0,
 };
 
+type CarPosition = typeof carPosition;
+
 const carState = {
-  movingUp: false,
-  movingDown: false,
+  movingForward: false,
+  movingBackward: false,
   movingLeft: false,
   movingRight: false,
 };
+
+type CarState = typeof carState;
 
 const carDirection = {
   up: true,
@@ -72,88 +47,77 @@ const carDirection = {
   right: false,
 };
 
-const setCarState = (key: KeyboardEvent['key']) => {
-  switch (key) {
-    case 'ArrowLeft': // left
-      carState.movingLeft = true;
-      carDirection.left = true;
-      break;
-    case 'ArrowUp': // up
-      carState.movingUp = true;
-      carDirection.up = true;
-      break;
-    case 'ArrowRight': // right
-      carState.movingRight = true;
-      carDirection.right = true;
-      break;
-    case 'ArrowDown': // down
-      carState.movingDown = true;
-      carDirection.down = true;
-      break;
-  }
-};
+type DirectionKey = 'ArrowLeft' | 'ArrowUp' | 'ArrowRight' | 'ArrowDown';
 
-const clearCarState = (key: KeyboardEvent['key']) => {
+const setCarState = (key: DirectionKey, pressed: boolean) => {
   switch (key) {
     case 'ArrowLeft':
-      carState.movingLeft = false;
-      carDirection.left = false;
+      carState.movingLeft = pressed;
+      carDirection.left = pressed;
       break;
     case 'ArrowUp':
-      carState.movingUp = false;
-      carDirection.up = false;
+      carState.movingForward = pressed;
+      carDirection.up = pressed;
       break;
     case 'ArrowRight':
-      carState.movingRight = false;
-      carDirection.right = false;
+      carState.movingRight = pressed;
+      carDirection.right = pressed;
       break;
     case 'ArrowDown':
-      carState.movingDown = false;
-      carDirection.down = false;
+      carState.movingBackward = pressed;
+      carDirection.down = pressed;
       break;
   }
 };
 
-// TODO: pure left and right aren't working
 const moveCar = (
-  key: KeyboardEvent['key'],
-  lot: CanvasRenderingContext2D,
-  car: ImageData
+  key: DirectionKey,
+  carPosition: CarPosition,
+  carState: CarState
 ) => {
-  setCarState(key);
-  if (carState.movingUp) {
+  setCarState(key, true);
+  if (carState.movingForward) {
+    carPosition.y--;
+  }
+  if (carState.movingBackward) {
+    carPosition.y++;
+  }
+  if (carState.movingBackward || carState.movingForward) {
     if (carState.movingLeft) {
       carPosition.x--;
-      carPosition.y--;
+      carPosition.orientation -= 5;
     } else if (carState.movingRight) {
       carPosition.x++;
-      carPosition.y--;
-    } else {
-      carPosition.y--;
+      carPosition.orientation += 5;
     }
   }
-  if (carState.movingDown) {
-    if (carState.movingLeft) {
-      carPosition.x--;
-      carPosition.y++;
-    } else if (carState.movingRight) {
-      carPosition.x++;
-      carPosition.y++;
-    } else {
-      carPosition.y++;
-    }
+  console.log(carPosition);
+};
+
+const isDirectionKey = (key: string): key is DirectionKey => {
+  switch (key) {
+    case 'ArrowLeft':
+    case 'ArrowUp':
+    case 'ArrowRight':
+    case 'ArrowDown':
+      return true;
+    default:
+      return false;
   }
-  renderCar(lot, car);
 };
 
 window.addEventListener('load', () => {
-  const lotCtx = drawLot();
-  const carImage = drawCar();
-  renderCar(lotCtx, carImage);
+  const [canvas, ctx] = createCanvas();
+  render(canvas, ctx);
   window.addEventListener('keydown', (e) => {
-    moveCar(e.key, lotCtx, carImage);
+    if (isDirectionKey(e.key)) {
+      moveCar(e.key, carPosition, carState);
+      render(canvas, ctx);
+    }
   });
   window.addEventListener('keyup', (e) => {
-    clearCarState(e.key);
+    if (isDirectionKey(e.key)) {
+      setCarState(e.key, false);
+    }
   });
 });
